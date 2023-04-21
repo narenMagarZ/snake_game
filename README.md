@@ -19,7 +19,7 @@ To play this game, you have two options, either visit this ()[] or you can clone
 - The left arrow key moves it to the left.
 - The right arrow key movese it to the right.
 
-The goal of the game is to eat as much food as possible without crashing into the wall's body or snake's own body. Each time the snake eats a piece of food, it grows in length and the player earns points. 
+The goal of the game is to eat as much food as possible without crashing into the wall or snake's own body. Each time the snake eats a piece of food, it grows in length and the player earns points. 
 
 
 ## Technologies used
