@@ -7,7 +7,8 @@ function SnakeFood(props:ISnakeFood){
           style={{
                transform:`translate(${x}px,${y}px)`
           }}
-          className="snake-food">
+          className="snake-food-wrapper">
+               <div className="snake-food"></div>
           </div>
      )
 }
