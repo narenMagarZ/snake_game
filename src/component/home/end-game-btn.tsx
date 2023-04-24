@@ -1,9 +1,11 @@
 
 
-function EndGameBtn(props:IStartGameBtn){
-     const {isGameStarted,setIsGameStarted}=props
+function EndGameBtn(props:IEndGameBtn){
+     const {
+          setGameStatus
+     }=props
      function endGame(){
-          setIsGameStarted(false)
+          setGameStatus('end')
      }
      return(
           <button
