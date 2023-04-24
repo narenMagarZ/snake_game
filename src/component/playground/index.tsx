@@ -26,7 +26,7 @@ function PlayGround(){
                y:0
           }
      ]
-     const [snakeBlock,setSnakeBlock]=useState<any[]>([])
+     const [snakeBlock,setSnakeBlock]=useState<TSnake>([])
      const [snakeDir,setSnakeDir]=useState<TSnakeDir>('forward')
      function setSnakeBlockCoordinate(axis:TAxis,direction:TDirection){
           snakeBlock.forEach((block,i)=>{
@@ -81,10 +81,10 @@ function PlayGround(){
                document.body.removeEventListener('keydown',moveSnake)
           }
      })
-     const[foodCoordinate,setFoodCoordinate]=useState<[number,number]>([0,0])
+     const[foodCoordinate,setFoodCoordinate]=useState<TCoordinate>([0,0])
      const[isFoodEaten,setIsFoodEaten]=useState(false)
 
-     function getRandomCoordinate():[number,number]{
+     function getRandomCoordinate():TCoordinate|undefined{
           setIsFoodEaten(false)
           const hX = playgroundRef.current?.clientWidth || 500
           const hY = playgroundRef.current?.clientHeight || 500
@@ -92,9 +92,10 @@ function PlayGround(){
           const x = Math.floor(Math.random()*(hX-diffBy))
           const y = Math.floor(Math.random()*(hY-diffBy))
           const newCoord = convertCoordinateToSuit([x,y])
-          return newCoord
+          if(isFoodOnSnake(snakeBlock,newCoord)) getRandomCoordinate()
+          else return newCoord
      }
-     function convertCoordinateToSuit(coordinate:[number,number]):[number,number]{
+     function convertCoordinateToSuit(coordinate:TCoordinate):TCoordinate{
           const [x,y]=coordinate
           const newCoordinate:[number,number] = [x,y]
           if(x%20!==0){
@@ -109,11 +110,13 @@ function PlayGround(){
      }
      useEffect(()=>{
           if(isFoodEaten){
-               setFoodCoordinate(getRandomCoordinate())
+               const foodCoordinate = getRandomCoordinate()||[0,0]
+               setFoodCoordinate(foodCoordinate)
           }
      },[isFoodEaten])
      useEffect(()=>{
-          setFoodCoordinate(getRandomCoordinate())
+          const foodCoordinate = getRandomCoordinate()||[0,0]
+          setFoodCoordinate(foodCoordinate)
      },[])
      const playgroundRef = useRef<HTMLDivElement>(null)
 
@@ -132,9 +135,10 @@ function PlayGround(){
                return newSnake
           })
      }
-     useEffect(()=>{
-          console.log(snakeBlock,'snakeblock')
-     },[snakeBlock])
+     function isFoodOnSnake(snake:TSnake,foodCoordinate:TCoordinate):boolean{
+          const[fX,Fy]=foodCoordinate
+          return snake.some(({x,y})=>(x===fX&&y===Fy))
+     }
      return(
           <div
           ref={playgroundRef}
