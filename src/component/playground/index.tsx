@@ -28,6 +28,8 @@ function PlayGround(){
      ]
      const [snakeBlock,setSnakeBlock]=useState<TSnake>([])
      const [snakeDir,setSnakeDir]=useState<TSnakeDir>('forward')
+     const [gamePoint,setGamePoint]=useState(0)
+     const intervalDelayRef = useRef(800)
      function setSnakeBlockCoordinate(axis:TAxis,direction:TDirection){
           snakeBlock.forEach((block,i)=>{
                if(i===snakeBlock.length-1){
@@ -45,21 +47,25 @@ function PlayGround(){
           switch(keyDown){
                case "w":
                     if(snakeDir==='downward')return
+                    if(snakeDir==='upward')return
                     setSnakeDir('upward')
                     setSnakeBlockCoordinate('y','neg')
                     break
                case "a":
                     if(snakeDir==='forward') return
+                    if(snakeDir==='backward')return
                     setSnakeDir('backward')
                     setSnakeBlockCoordinate('x','neg')
                     break
                case "s":
                     if(snakeDir==='upward')return
+                    if(snakeDir==='downward')return
                     setSnakeDir('downward')
                     setSnakeBlockCoordinate('y','pos')
                     break
                case "d":
                     if(snakeDir==='backward')return
+                    if(snakeDir==='forward') return
                     setSnakeDir('forward')
                     setSnakeBlockCoordinate('x','pos')
                     break
@@ -67,6 +73,7 @@ function PlayGround(){
                     break
           }
           if(checkIfFoodIsEaten(snakeBlock[snakeBlock.length-1])){
+               setGamePoint(prev=>prev+5)
                setIsFoodEaten(true)
                growSnakeOnFoodEaten()
           }
@@ -118,6 +125,11 @@ function PlayGround(){
           const foodCoordinate = getRandomCoordinate()||[0,0]
           setFoodCoordinate(foodCoordinate)
      },[])
+     useEffect(()=>{
+          if(intervalDelayRef.current >100)
+          intervalDelayRef.current -=60
+
+     },[gamePoint])
      const playgroundRef = useRef<HTMLDivElement>(null)
 
      function checkIfFoodIsEaten(snakeHeadCoordinate:{x:number,y:number}){
@@ -139,6 +151,34 @@ function PlayGround(){
           const[fX,Fy]=foodCoordinate
           return snake.some(({x,y})=>(x===fX&&y===Fy))
      }
+     function snakeAnimation(){
+          if(snakeDir==='forward'){
+               setSnakeBlockCoordinate('x','pos')
+          }
+          else if(snakeDir==='downward'){
+               setSnakeBlockCoordinate('y','pos')
+          }
+          else if(snakeDir==='upward'){
+               setSnakeBlockCoordinate('y','neg')
+          }
+          else if(snakeDir==='backward'){
+               setSnakeBlockCoordinate('x','neg')
+          }
+          if(checkIfFoodIsEaten(snakeBlock[snakeBlock.length-1])){
+               setIsFoodEaten(true)
+               setGamePoint(prev=>prev+5)
+               growSnakeOnFoodEaten()
+          }
+     }
+     const snakeAnimationIntervalRef = useRef<any>(null)
+     useEffect(()=>{
+          snakeAnimationIntervalRef.current = setInterval(()=>{
+               snakeAnimation()
+          },intervalDelayRef.current)
+          return()=>{
+               clearInterval(snakeAnimationIntervalRef.current)
+          }
+     })
      return(
           <div
           ref={playgroundRef}
