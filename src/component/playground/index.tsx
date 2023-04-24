@@ -68,6 +68,7 @@ function PlayGround(){
           }
           if(checkIfFoodIsEaten(snakeBlock[snakeBlock.length-1])){
                setIsFoodEaten(true)
+               growSnakeOnFoodEaten()
           }
      }
      useEffect(()=>{
@@ -91,7 +92,6 @@ function PlayGround(){
           const x = Math.floor(Math.random()*(hX-diffBy))
           const y = Math.floor(Math.random()*(hY-diffBy))
           const newCoord = convertCoordinateToSuit([x,y])
-          console.log(newCoord)
           return newCoord
      }
      function convertCoordinateToSuit(coordinate:[number,number]):[number,number]{
@@ -116,15 +116,25 @@ function PlayGround(){
           setFoodCoordinate(getRandomCoordinate())
      },[])
      const playgroundRef = useRef<HTMLDivElement>(null)
-     useEffect(()=>{
-          console.log(snakeBlock[snakeBlock.length-1],'this is snake head coordinate')
-     })
 
      function checkIfFoodIsEaten(snakeHeadCoordinate:{x:number,y:number}){
           const{x:headX,y:headY}=snakeHeadCoordinate
           const[fX,fY]=foodCoordinate
           return headX===fX&&headY===fY
      }
+     function growSnakeOnFoodEaten(){
+          const newSnakeBlock = {
+               x:snakeBlock[0].x,
+               y:snakeBlock[0].y
+          }
+          setSnakeBlock((prev)=>{
+               const newSnake = [newSnakeBlock,...prev]
+               return newSnake
+          })
+     }
+     useEffect(()=>{
+          console.log(snakeBlock,'snakeblock')
+     },[snakeBlock])
      return(
           <div
           ref={playgroundRef}
