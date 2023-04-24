@@ -1,9 +1,11 @@
 
 
 function StartGameBtn(props:IStartGameBtn){
-     const {isGameStarted,setIsGameStarted}=props
+     const {
+          setGameStatus
+     }=props
      function startGame(){
-          setIsGameStarted(prev=>!prev)
+          setGameStatus('playing')
      }
      return(
           <button 
