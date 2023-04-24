@@ -4,7 +4,6 @@ import Block from "./block"
 
 function Snake(props:ISnake){
      const {snake,snakeBlock}=props
-     console.log(snake)
      return(
           <div
           className="snake"
