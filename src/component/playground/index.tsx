@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import SnakeFood from "../food"
 import Snake from "../snake"
 
 
-function PlayGround(){
+function PlayGround(props:IPlayground){
+     const{gameStatus}=props
      const initialSnake = [
           {
                x:0,
@@ -20,7 +21,7 @@ function PlayGround(){
           {
                x:60,
                y:0
-          },
+          },   
           {
                x:80,
                y:0
@@ -29,7 +30,7 @@ function PlayGround(){
      const [snakeBlock,setSnakeBlock]=useState<TSnake>([])
      const [snakeDir,setSnakeDir]=useState<TSnakeDir>('forward')
      const [gamePoint,setGamePoint]=useState(0)
-     const intervalDelayRef = useRef(800)
+     const intervalDelayRef = useRef(500)
      function setSnakeBlockCoordinate(axis:TAxis,direction:TDirection){
           snakeBlock.forEach((block,i)=>{
                if(i===snakeBlock.length-1){
@@ -43,6 +44,8 @@ function PlayGround(){
           setSnakeBlock([...snakeBlock])
      }
      function moveSnake(ev:KeyboardEvent){
+          if(gameStatus!=='playing')
+          return
           const keyDown = ev.key.toLocaleLowerCase()
           switch(keyDown){
                case "w":
@@ -79,8 +82,13 @@ function PlayGround(){
           }
      }
      useEffect(()=>{
-          setSnakeBlock([...initialSnake])
-     },[])
+          if(gameStatus==='idle'){
+               setSnakeDir('forward')
+               setGamePoint(0)
+               intervalDelayRef.current = 500
+               setSnakeBlock([...initialSnake])
+          }
+     },[gameStatus])
      const snakeRef = useRef<HTMLDivElement>(null)
      useEffect(()=>{
           document.body.addEventListener('keydown',moveSnake)
@@ -172,13 +180,39 @@ function PlayGround(){
      }
      const snakeAnimationIntervalRef = useRef<any>(null)
      useEffect(()=>{
-          snakeAnimationIntervalRef.current = setInterval(()=>{
-               snakeAnimation()
-          },intervalDelayRef.current)
+          // start the snake animation only if the game is started
+          if(gameStatus==='playing'){
+               snakeAnimationIntervalRef.current = setInterval(()=>{
+                    const isBite = checkIfSnakeBiteItself(snakeBlock)
+                    console.log(isBite,'bite')
+                    // if isBite true, then end the game 
+                    // here, the game looks laggy
+                    // needs to figure out
+                    snakeAnimation()
+               },intervalDelayRef.current)
+          }
+          else if(gameStatus==='paused'){
+               clearInterval(snakeAnimationIntervalRef.current)
+          }
           return()=>{
                clearInterval(snakeAnimationIntervalRef.current)
           }
      })
+     // useEffect(()=>{
+     //      if(gameStatus==='idle'){
+     //           setSnakeBlock([...initialSnake])
+     //      }
+     // },[gameStatus])
+     function checkIfSnakeBiteItself(snake:TSnake){
+          const {x:headX,y:headY} = snake[snake.length-1]
+          const snakeClone = [...snake]
+          snakeClone.pop()
+          const isBite = snakeClone.some(({x,y})=>{
+               if(x===headX && y===headY)
+               return true
+          })
+          return isBite
+     }
      return(
           <div
           ref={playgroundRef}
