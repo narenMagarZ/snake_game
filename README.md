@@ -4,7 +4,7 @@ Snake game is classic mobile game.
 
 ## Getting started
 
-To play this game, you have two options, either visit this (SnakeGame)[https://vercel.com/narenmagarz/snake-game] or you can clone this repository to your local machine. Follow these steps for second option:
+To play this game, you have two options, either visit this [SnakeGame](https://snake-game-rho-one.vercel.app/) or you can clone this repository to your local machine. Follow these steps for second option:
 
 1. Clone the repository to your local machine.
 2. Install the necessary dependencies by running 'npm install'.
