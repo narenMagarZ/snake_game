@@ -4,7 +4,7 @@ import Snake from "../snake"
 
 
 function PlayGround(props:IPlayground){
-     const{gameStatus}=props
+     const{gameStatus,gamePoint,setGamePoint,setGameStatus}=props
      const initialSnake = [
           {
                x:0,
@@ -29,7 +29,6 @@ function PlayGround(props:IPlayground){
      ]
      const [snakeBlock,setSnakeBlock]=useState<TSnake>([])
      const [snakeDir,setSnakeDir]=useState<TSnakeDir>('forward')
-     const [gamePoint,setGamePoint]=useState(0)
      const intervalDelayRef = useRef(500)
      function setSnakeBlockCoordinate(axis:TAxis,direction:TDirection){
           snakeBlock.forEach((block,i)=>{
@@ -48,24 +47,28 @@ function PlayGround(props:IPlayground){
           return
           const keyDown = ev.key.toLocaleLowerCase()
           switch(keyDown){
+               case "arrowup":
                case "w":
                     if(snakeDir==='downward')return
                     if(snakeDir==='upward')return
                     setSnakeDir('upward')
                     setSnakeBlockCoordinate('y','neg')
                     break
+               case "arrowleft":
                case "a":
                     if(snakeDir==='forward') return
                     if(snakeDir==='backward')return
                     setSnakeDir('backward')
                     setSnakeBlockCoordinate('x','neg')
                     break
+               case "arrowdown":
                case "s":
                     if(snakeDir==='upward')return
                     if(snakeDir==='downward')return
                     setSnakeDir('downward')
                     setSnakeBlockCoordinate('y','pos')
                     break
+               case "arrowright":
                case "d":
                     if(snakeDir==='backward')return
                     if(snakeDir==='forward') return
@@ -134,7 +137,7 @@ function PlayGround(props:IPlayground){
           setFoodCoordinate(foodCoordinate)
      },[])
      useEffect(()=>{
-          if(intervalDelayRef.current >100)
+          if(intervalDelayRef.current>100)
           intervalDelayRef.current -=60
 
      },[gamePoint])
@@ -180,14 +183,13 @@ function PlayGround(props:IPlayground){
      }
      const snakeAnimationIntervalRef = useRef<any>(null)
      useEffect(()=>{
-          // start the snake animation only if the game is started
           if(gameStatus==='playing'){
                snakeAnimationIntervalRef.current = setInterval(()=>{
                     const isBite = checkIfSnakeBiteItself(snakeBlock)
-                    console.log(isBite,'bite')
-                    // if isBite true, then end the game 
-                    // here, the game looks laggy
-                    // needs to figure out
+                    const isSnakeHitOnWall = checkIfSnakeHitOnWall(snakeBlock)
+                    if(isBite||isSnakeHitOnWall){
+                         setGameStatus('end')
+                    }
                     snakeAnimation()
                },intervalDelayRef.current)
           }
@@ -198,11 +200,6 @@ function PlayGround(props:IPlayground){
                clearInterval(snakeAnimationIntervalRef.current)
           }
      })
-     // useEffect(()=>{
-     //      if(gameStatus==='idle'){
-     //           setSnakeBlock([...initialSnake])
-     //      }
-     // },[gameStatus])
      function checkIfSnakeBiteItself(snake:TSnake){
           const {x:headX,y:headY} = snake[snake.length-1]
           const snakeClone = [...snake]
@@ -213,14 +210,31 @@ function PlayGround(props:IPlayground){
           })
           return isBite
      }
+     function checkIfSnakeHitOnWall(snake:TSnake){
+          const playground = playgroundRef.current
+          const playgroundHeight = playground?.clientHeight
+          const playgroundWidth = playground?.clientWidth
+          const snakeHead = snake[snake.length-1]
+          const{x:headX,y:headY}=snakeHead
+          if(playgroundHeight && playgroundWidth){
+               if((headX)>playgroundWidth || (headY)>playgroundHeight 
+               || headX<0 || headY<0)
+               return true
+          }
+          return false
+     }
      return(
           <div
           ref={playgroundRef}
-          className="border p-0 border-primary border border-primary playground"
+          className="p-0 border-primary rounded border border-danger playground"
           >
-               <SnakeFood
-               foodCoordinate={foodCoordinate}
-               />
+               {
+                    (gameStatus==='paused'||gameStatus==='playing')
+                    && <SnakeFood
+                    foodCoordinate={foodCoordinate}
+                    />
+               }
+               
                <Snake
                snake={snakeRef}
                snakeBlock={snakeBlock}
