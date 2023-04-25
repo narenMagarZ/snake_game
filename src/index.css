@@ -16,6 +16,7 @@ input,button{
   outline: none;
 }
 
+
 .home{
   position: fixed;
   width: 100%;
@@ -53,7 +54,6 @@ input,button{
   position:fixed;
   height: 20px;
   width: 20px;
-  border: 1px solid red;
   display: flex;
   align-items: center;
   justify-content: center;
