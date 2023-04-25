@@ -34,10 +34,17 @@ type TCoordinate = [number,number]
 
 interface IPlayground{
      gameStatus:TGameStatus
+     setGameStatus:React.Dispatch<React.SetStateAction<TGameStatus>>
+     gamePoint:number
+     setGamePoint:React.Dispatch<React.SetStateAction<number>>
 }
 type TGameStatus = 'idle'|'playing'|'paused'|'end'
 
 interface IPauseGameBtn {
      gameStatus:TGameStatus
      setGameStatus:React.Dispatch<React.SetStateAction<TGameStatus>>
+}
+
+interface IGamePoint{
+     gamePoint:number
 }
